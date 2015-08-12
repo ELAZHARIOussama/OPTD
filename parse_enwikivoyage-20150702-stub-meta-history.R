@@ -6,21 +6,28 @@ parse_xml_dump <- function (input, output) {
     # getting the fields
     title = xmlValue(xmlElementsByTagName(xmlParent(n),"title")[[1]])
     timestamp = xmlValue(xmlElementsByTagName(n,"timestamp")[[1]])
+    
     if(length(xmlElementsByTagName(n,"contributor"))>0){
       contributor = xmlElementsByTagName(n,"contributor")[[1]]
       
-      
-      if (length(xmlElementsByTagName(contributor,"username"))==0){
-        contributorRef = xmlValue(xmlElementsByTagName(contributor,"ip")[[1]]) 
+      if(nchar(xmlValue(contributor))>0){
+        if (length(xmlElementsByTagName(contributor,"username"))==0){
+          contributorRef = xmlValue(xmlElementsByTagName(contributor,"ip")[[1]]) 
+        }
+        if (length(xmlElementsByTagName(contributor,"ip"))==0){
+          contributorRef = xmlValue(xmlElementsByTagName(contributor,"username")[[1]]) 
+        }
       }
-      else {
-        contributorRef = xmlValue(xmlElementsByTagName(contributor,"username")[[1]])
+      else{  
+        contributorRef = NA 
       }
     }
     else {
       contributorRef = NA 
     }
-    data.frame(title=title, timestamp =timestamp , contributor = contributorRef)
+    f<-data.frame(title=title, timestamp =timestamp , contributor = contributorRef)
+    print(f)
+    
   }
   
   f <- Reduce(rbind,xpathApply(data1, "//x:revision",fun=gen_frame,namespaces=c(x="http://www.mediawiki.org/xml/export-0.10/")))
