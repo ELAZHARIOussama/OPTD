@@ -1,6 +1,6 @@
 # this function do the joining and provides as result a data frame containig all revision done on cities
 
-revisions_on_cities<-function(input,optd_cities,wikipedia_wikidata,wikivoyage_wikidata,output){
+revisions_on_cities<-function(input,optdCities,wikipediaWikidata,wikivoyageWikidata,output){
   
   #reading the wikivoyage revision history.  
   data_frame<-read.table(input,sep="," ,na.strings = "NA",col.names=c("title","timestamp","contributor"))
@@ -9,12 +9,12 @@ revisions_on_cities<-function(input,optd_cities,wikipedia_wikidata,wikivoyage_wi
   data_frame$short_url<-sapply(data_frame$title,function(x) {URLencode(gsub(" ","_",x))})
   
   #reading the file extracted from OPTD
-  citiesByName<-read.table(aux1,sep="^",col.names=c("IATA code","City name","Type of location","wikipedia url redirection"))
+  citiesByName<-read.table(optd_cities,sep="^",col.names=c("IATA code","City name","Type of location","wikipedia url redirection"))
   citiesByName$short_url <- substr (citiesByName[,4],30,1000000L)
   
   #reading the files extracted form wikidata_sitelinks
-  wikipedia_wikidata<-read.table(aux2,sep=" ") 
-  wikivoyage_wikidata<-read.table(aux3,sep="^")
+  wikipedia_wikidata<-read.table(wikipediaWikidata,sep=" ") 
+  wikivoyage_wikidata<-read.table(wikivoyageWikidata,sep="^")
   
   # First join between OPTD and wikipedia_wikidata
   optd_wd<-merge(citiesByName[citiesByName$short_url!="",],wikipedia_wikidata,by.x="short_url",by.y="V1",all.x = TRUE) 
@@ -39,4 +39,7 @@ revisions_on_cities<-function(input,optd_cities,wikipedia_wikidata,wikivoyage_wi
 }
 
 revisions_on_cities("parse_enwikivoyage-20150702-stub-meta-history_split.csv","citiesByNames1.csv","wikipedia_wikidata.csv","wikivoyage_wikidata.csv","wikivoyage_cities_history.csv")
+
+
+
 
